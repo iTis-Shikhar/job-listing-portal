@@ -1,7 +1,23 @@
-export default function App() {
+import { Routes, Route } from 'react-router-dom';
+import Home from './pages/Home';
+import Login from './pages/Login';
+import Signup from './pages/Signup';
+import SeekerDashboard from './pages/SeekerDashboard';
+import EmployerDashboard from './pages/EmployerDashboard';
+
+function App() {
   return (
-    <h1 className="text-3xl font-bold underline text-red-500">
-      Hello Team! Setup is successful.
-    </h1>
-  )
+    <div className="min-h-screen">
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+        {/* New Dashboard Routes */}
+        <Route path="/seeker-dashboard" element={<SeekerDashboard />} />
+        <Route path="/employer-dashboard" element={<EmployerDashboard />} />
+      </Routes>
+    </div>
+  );
 }
+
+export default App;
