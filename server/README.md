@@ -14,24 +14,37 @@ Backend REST API for the Job Listing Portal, built with **Express.js** and **Mon
 
 ```
 server/
-├── config/
-│   └── db.js                 # MongoDB connection setup
-├── controllers/
-│   └── authController.js     # Register, login & profile logic
-├── middleware/
-│   └── authMiddleware.js     # JWT auth guard (protect middleware)
-├── models/
-│   └── User.js               # User schema & password hashing
-├── routes/
-│   ├── authRoutes.js         # POST /api/auth/register & /login
-│   └── userRoutes.js         # GET  /api/user/profile (protected)
-├── scripts/
-│   └── verify_auth.js        # Auth verification script
-├── utils/
-│   └── generateToken.js      # JWT token generator (30-day expiry)
-├── .env                      # Environment variables (not committed)
+├── src/
+│   ├── app.js                      # Express app configuration
+│   ├── config/
+│   │   └── db.js                   # MongoDB connection setup
+│   ├── controllers/
+│   │   ├── authController.js       # Register & login logic
+│   │   ├── jobController.js        # Job CRUD operations
+│   │   ├── jobSeekerProfileController.js
+│   │   └── employerProfileController.js
+│   ├── middleware/
+│   │   ├── authMiddleware.js       # JWT auth guard
+│   │   └── upload.js               # File upload middleware
+│   ├── models/
+│   │   ├── User.js                 # User schema & password hashing
+│   │   ├── Job.js                  # Job listing schema
+│   │   ├── JobSeekerProfile.js     # Job seeker profile schema
+│   │   └── EmployerProfile.js      # Employer profile schema
+│   ├── routes/
+│   │   ├── authRoutes.js           # POST /api/auth/register & /login
+│   │   ├── userRoutes.js           # GET /api/user/profile (protected)
+│   │   ├── jobRoutes.js            # Job listing endpoints
+│   │   ├── jobSeekerProfileRoutes.js
+│   │   └── employerProfileRoutes.js
+│   └── utils/
+│       ├── generateToken.js        # JWT token generator (30-day expiry)
+│       └── imagekitUpload.js       # ImageKit file upload utility
+├── .env                            # Environment variables (not committed)
+├── .env.example                    # Example environment variables
 ├── package.json
-└── server.js                 # App entry point
+└── server.js                       # Server entry point
+
 ```
 
 ## Getting Started
@@ -87,6 +100,18 @@ The server will start at **http://localhost:5000**.
 | Method | Endpoint   | Description      | Access  |
 | ------ | ---------- | ---------------- | ------- |
 | GET    | `/profile` | Get user profile | Private |
+
+### Job Routes — `/api/jobs`
+
+| Method | Endpoint           | Description                   | Access  |
+| ------ | ------------------ | ----------------------------- | ------- |
+| POST   | `/`                | Create a new job listing      | Private (Employer) |
+| GET    | `/`                | Get all active jobs (paginated) | Public |
+| GET    | `/:id`             | Get job by ID                 | Public |
+| GET    | `/employer/me`     | Get current employer's jobs   | Private (Employer) |
+| PUT    | `/:id`             | Update job listing            | Private (Employer, own jobs) |
+| PATCH  | `/:id/status`      | Update job status             | Private (Employer, own jobs) |
+| DELETE | `/:id`             | Delete job (soft delete)      | Private (Employer, own jobs) |
 
 > **Private** routes require a `Bearer` token in the `Authorization` header.
 
