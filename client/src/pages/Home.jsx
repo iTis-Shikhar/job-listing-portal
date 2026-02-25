@@ -1,33 +1,39 @@
 import { Link } from 'react-router-dom';
-import logo from '../assets/logo.png'; // Make sure your logo is saved here!
+import { motion } from 'framer-motion';
+import logo from '../assets/logo.png'; 
 
 const Home = () => {
   return (
-    <div className="min-h-screen bg-brand-black text-white font-sans overflow-x-hidden">
+    <div className="relative min-h-screen w-full text-white font-sans overflow-x-hidden">
       
-      {/* --- HERO SECTION (Floating & Glowing) --- */}
-      <div className="relative flex flex-col items-center justify-center min-h-screen p-6">
+      {/* --- HERO SECTION --- */}
+      <div className="relative flex flex-col items-center justify-center min-h-screen p-6 w-full">
         
-        {/* Background Gradient Orbs */}
-        <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-brand-gold rounded-full mix-blend-multiply filter blur-[128px] opacity-20 animate-pulse"></div>
-        <div className="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-gray-600 rounded-full mix-blend-multiply filter blur-[128px] opacity-20"></div>
-
         {/* Floating Navbar */}
         <header className="absolute top-0 w-full max-w-7xl mx-auto p-6 flex justify-between items-center z-20">
-          <div className="flex items-center gap-3">
-            {/* Added a subtle white glow behind the logo so the black text doesn't disappear on the dark background */}
-            <img 
+          <motion.div 
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="flex items-center gap-3"
+          >
+            {/* --- UPDATED: Magnetic Logo --- */}
+            <motion.img 
               src={logo} 
               alt="HireSphere Logo" 
-              className="h-12 object-contain bg-white/90 px-3 py-1 rounded-xl shadow-[0_0_15px_rgba(255,255,255,0.1)]" 
+              whileHover={{ scale: 1.1, rotate: 5 }} 
+              whileTap={{ scale: 0.9 }}
+              drag
+              dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
+              dragElastic={0.5}
+              className="h-12 object-contain bg-white/90 px-3 py-1 rounded-xl shadow-[0_0_20px_rgba(255,255,255,0.2)] cursor-grab active:cursor-grabbing" 
             /> 
-          </div>
+          </motion.div>
           
           <div className="space-x-4 md:space-x-6">
-            <Link to="/login" className="text-gray-300 hover:text-white font-medium transition-colors">
+            <Link to="/login" className="text-white/70 hover:text-white font-medium transition-colors">
               Log In
             </Link>
-            <Link to="/signup" className="px-5 py-2 md:px-6 md:py-2.5 bg-brand-gold/10 text-brand-gold border border-brand-gold/50 rounded-full font-medium transition-all duration-300 hover:bg-brand-gold hover:text-brand-black hover:shadow-[0_0_20px_rgba(197,157,95,0.6)]">
+            <Link to="/signup" className="px-6 py-2.5 bg-white/10 backdrop-blur-md text-white border border-white/20 rounded-full font-medium transition-all duration-300 hover:bg-white hover:text-black">
               Sign Up
             </Link>
           </div>
@@ -35,73 +41,81 @@ const Home = () => {
 
         {/* Main Hero Content */}
         <main className="text-center z-10 max-w-4xl mx-auto mt-20">
-          <div className="inline-block mb-6 px-4 py-1.5 rounded-full border border-brand-gold/30 bg-brand-gold/5 text-brand-gold text-sm font-semibold tracking-wide">
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="inline-block mb-6 px-4 py-1.5 rounded-full border border-cyan-400/30 bg-cyan-400/10 text-cyan-300 text-sm font-semibold tracking-wide backdrop-blur-sm"
+          >
             Welcome to the Future of Hiring
-          </div>
-          <h1 className="text-5xl md:text-7xl font-heading font-bold mb-6 leading-tight">
+          </motion.div>
+          
+          <motion.h1 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="text-5xl md:text-7xl font-bold mb-6 leading-tight"
+          >
             Find Your Next <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-gold to-yellow-200">
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">
               Career Move.
             </span>
-          </h1>
-          <p className="text-lg md:text-xl text-gray-400 mb-10 font-sans max-w-2xl mx-auto leading-relaxed">
-            HireSphere is the ultimate platform connecting ambitious talent with industry-leading employers. Discover roles that match your passion, or find the perfect candidate to grow your team.
-          </p>
-          <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
-            <Link to="/signup" className="px-8 py-4 w-full sm:w-auto bg-brand-gold text-brand-black rounded-full font-bold text-lg transition-all duration-300 hover:shadow-[0_0_30px_rgba(197,157,95,0.8)] hover:-translate-y-1">
+          </motion.h1>
+
+          <motion.p 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.4 }}
+            className="text-lg md:text-xl text-white/60 mb-10 max-w-2xl mx-auto leading-relaxed"
+          >
+            HireSphere is the ultimate platform connecting ambitious talent with industry-leading employers. Discover roles that match your passion.
+          </motion.p>
+
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.6 }}
+            className="flex flex-col sm:flex-row justify-center items-center gap-4"
+          >
+            <Link to="/signup" className="px-8 py-4 w-full sm:w-auto bg-gradient-to-r from-cyan-500 to-blue-600 text-white rounded-full font-bold text-lg transition-all duration-300 hover:shadow-[0_0_30px_rgba(6,182,212,0.5)] hover:-translate-y-1 text-center">
               Explore Opportunities
             </Link>
-            <Link to="/login" className="px-8 py-4 w-full sm:w-auto bg-transparent border border-gray-600 text-white rounded-full font-bold text-lg transition-all duration-300 hover:border-brand-gold hover:text-brand-gold">
+            <Link to="/login" className="px-8 py-4 w-full sm:w-auto bg-white/5 border border-white/20 text-white rounded-full font-bold text-lg backdrop-blur-md transition-all duration-300 hover:bg-white/10 hover:border-white/40 text-center">
               Post a Job
             </Link>
-          </div>
+          </motion.div>
         </main>
       </div>
 
       {/* --- INFO / FEATURES SECTION --- */}
-      <section className="relative z-10 bg-[#0f0f0f] py-20 px-6 border-t border-gray-800">
+      <section className="relative z-10 py-20 px-6 w-full">
         <div className="max-w-7xl mx-auto text-center">
-          <h2 className="text-3xl md:text-4xl font-heading font-bold mb-16 text-white">
-            Why Choose <span className="text-brand-gold">HireSphere?</span>
+          <h2 className="text-3xl md:text-4xl font-bold mb-16 text-white">
+            Why Choose <span className="text-cyan-400">HireSphere?</span>
           </h2>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {/* Feature 1 */}
-            <div className="p-8 bg-brand-black border border-gray-800 rounded-2xl hover:border-brand-gold/50 transition-all hover:-translate-y-2 duration-300">
-              <div className="w-14 h-14 bg-brand-gold/10 rounded-xl flex items-center justify-center mx-auto mb-6">
-                <span className="text-brand-gold text-2xl">⚡</span>
-              </div>
-              <h3 className="text-xl font-bold mb-3">Fast-Track Hiring</h3>
-              <p className="text-gray-400 text-sm leading-relaxed">
-                Our smart matching algorithm puts your profile directly in front of recruiters looking for your exact skills and experience.
-              </p>
-            </div>
-
-            {/* Feature 2 */}
-            <div className="p-8 bg-brand-black border border-gray-800 rounded-2xl hover:border-brand-gold/50 transition-all hover:-translate-y-2 duration-300">
-              <div className="w-14 h-14 bg-brand-gold/10 rounded-xl flex items-center justify-center mx-auto mb-6">
-                <span className="text-brand-gold text-2xl">🏢</span>
-              </div>
-              <h3 className="text-xl font-bold mb-3">Premium Companies</h3>
-              <p className="text-gray-400 text-sm leading-relaxed">
-                Access exclusive job postings from top-tier startups and established Fortune 500 enterprises around the globe.
-              </p>
-            </div>
-
-            {/* Feature 3 */}
-            <div className="p-8 bg-brand-black border border-gray-800 rounded-2xl hover:border-brand-gold/50 transition-all hover:-translate-y-2 duration-300">
-              <div className="w-14 h-14 bg-brand-gold/10 rounded-xl flex items-center justify-center mx-auto mb-6">
-                <span className="text-brand-gold text-2xl">🔒</span>
-              </div>
-              <h3 className="text-xl font-bold mb-3">Secure & Private</h3>
-              <p className="text-gray-400 text-sm leading-relaxed">
-                Your data is fully encrypted. You control exactly who sees your resume and contact information at all times.
-              </p>
-            </div>
+            {[
+              { icon: "⚡", title: "Fast-Track Hiring", desc: "Our smart matching algorithm puts your profile directly in front of recruiters." },
+              { icon: "🏢", title: "Premium Companies", desc: "Access exclusive job postings from top-tier startups and Fortune 500 enterprises." },
+              { icon: "🔒", title: "Secure & Private", desc: "Your data is fully encrypted. You control exactly who sees your information." }
+            ].map((feature, index) => (
+              <motion.div 
+                key={index}
+                whileHover={{ y: -10 }}
+                className="glass-effect p-8 rounded-3xl border border-white/10 transition-all"
+              >
+                <div className="w-14 h-14 bg-white/10 rounded-2xl flex items-center justify-center mx-auto mb-6 text-2xl">
+                  {feature.icon}
+                </div>
+                <h3 className="text-xl font-bold mb-3">{feature.title}</h3>
+                <p className="text-white/50 text-sm leading-relaxed">
+                  {feature.desc}
+                </p>
+              </motion.div>
+            ))}
           </div>
         </div>
       </section>
-
     </div>
   );
 };
