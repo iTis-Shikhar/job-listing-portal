@@ -1,18 +1,19 @@
 import Sidebar from '../components/Sidebar';
-import logo from '../assets/logo.png'; 
+import logo from '../assets/logo.png';
+import { Link } from 'react-router-dom';
 
 const EmployerDashboard = () => {
   const user = JSON.parse(localStorage.getItem('user'));
 
   return (
     <div className="flex h-screen bg-brand-black overflow-hidden font-sans text-white">
-      
+
       {/* Sidebar Component (Passing 'employer' role) */}
       <Sidebar role="employer" />
 
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col h-screen overflow-y-auto relative">
-        
+
         {/* Subtle Background Glow */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[300px] bg-brand-gold rounded-full mix-blend-multiply filter blur-[150px] opacity-10 pointer-events-none"></div>
 
@@ -33,9 +34,11 @@ const EmployerDashboard = () => {
               <h2 className="text-3xl font-heading font-bold mb-2">Employer Dashboard</h2>
               <p className="text-gray-400">Manage your job postings and review applicants.</p>
             </div>
-            <button className="px-6 py-3 bg-brand-gold text-black font-bold rounded-lg hover:bg-yellow-500 transition-colors shadow-[0_0_15px_rgba(197,157,95,0.3)]">
-              + Post New Job
-            </button>
+            <Link to="/post-job">
+              <button className="px-6 py-3 bg-brand-gold text-black font-bold rounded-lg hover:bg-yellow-500 transition-colors shadow-[0_0_15px_rgba(197,157,95,0.3)]">
+                + Post New Job
+              </button>
+            </Link>
           </div>
 
           {/* Stats Overview */}
