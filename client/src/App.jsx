@@ -1,39 +1,26 @@
-import { Routes, Route, Link } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
+import Home from './pages/Home';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
+import SeekerDashboard from './pages/SeekerDashboard';
+import EmployerDashboard from './pages/EmployerDashboard';
+import EmployerProfile from './pages/EmployerProfile';
+import PostJob from './pages/PostJob';
+import SeekerProfile from './pages/SeekerProfile';
 
 function App() {
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* This is the Routing System */}
+    <div className="min-h-screen">
       <Routes>
-        
-        {/* HOME PAGE: Now with Buttons! */}
-        <Route path="/" element={
-          <div className="flex flex-col items-center justify-center h-screen">
-            <h1 className="text-4xl font-bold mb-8 text-blue-900">Welcome to Job Portal!</h1>
-            <p className="mb-8 text-gray-600">Please choose an option to continue:</p>
-            
-            <div className="space-x-4">
-              <Link to="/login">
-                <button className="px-6 py-3 bg-green-500 text-white rounded-lg shadow hover:bg-green-600 transition">
-                  Login
-                </button>
-              </Link>
-              
-              <Link to="/signup">
-                <button className="px-6 py-3 bg-blue-500 text-white rounded-lg shadow hover:bg-blue-600 transition">
-                  Sign Up
-                </button>
-              </Link>
-            </div>
-          </div>
-        } />
-
-        {/* The other pages are hidden here */}
+        <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
-        
+        {/* New Dashboard Routes */}
+        <Route path="/seeker-dashboard" element={<SeekerDashboard />} />
+        <Route path="/employer-dashboard" element={<EmployerDashboard />} />
+        <Route path="/employer-profile" element={<EmployerProfile />} />
+        <Route path="/post-job" element={<PostJob />} />
+        <Route path="/seeker-profile" element={<SeekerProfile />} />
       </Routes>
     </div>
   );
