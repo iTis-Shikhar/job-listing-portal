@@ -1,6 +1,5 @@
 const express = require('express');
 const cors = require('cors');
-const path = require('path');
 const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
 const jobSeekerProfileRoutes = require('./routes/jobSeekerProfileRoutes');
@@ -17,8 +16,6 @@ connectDB();
 app.use(express.json());
 app.use(cors());
 
-// Serve static files for uploads (with basic security - only resumes)
-app.use('/uploads/resumes', express.static(path.join(__dirname, '../uploads/resumes')));
 
 app.get('/', (req, res) => {
     res.send('Server is running');
