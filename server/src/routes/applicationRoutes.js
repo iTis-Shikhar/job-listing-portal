@@ -7,11 +7,11 @@ const {
     updateApplicationStatus
 } = require('../controllers/applicationController');
 const { protect } = require('../middleware/authMiddleware');
-const upload = require('../middleware/uploadMiddleware');
+const { uploadResume, handleUploadError } = require('../middleware/upload');
 
 router.use(protect); // All application routes are protected
 
-router.post('/', upload.single('resume'), applyToJob);
+router.post('/', uploadResume, handleUploadError, applyToJob);
 router.get('/my-applications', getJobSeekerApplications);
 router.get('/employer/me', getEmployerApplications);
 router.patch('/:id/status', updateApplicationStatus);

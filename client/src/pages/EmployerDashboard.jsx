@@ -1,19 +1,47 @@
+import { useState, useEffect } from 'react';
+import axios from 'axios';
 import Sidebar from '../components/Sidebar';
 import logo from '../assets/logo.png';
 import { Link } from 'react-router-dom';
 
 const EmployerDashboard = () => {
   const user = JSON.parse(localStorage.getItem('user'));
+  const [stats, setStats] = useState({ jobs: 0, applicants: 0 });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const res = await axios.get('http://localhost:5000/api/dashboard/employer', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        
+        if (res.data.success) {
+          setStats({
+            jobs: res.data.data.jobs.total || 0,
+            applicants: res.data.data.applications.total || 0
+          });
+        }
+      } catch (error) {
+        console.error('Error fetching dashboard stats:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDashboardData();
+  }, []);
 
   return (
     <div className="flex h-screen bg-brand-black overflow-hidden font-sans text-white">
-
-      {/* Sidebar Component (Passing 'employer' role) */}
+      
+      {/* Sidebar Component */}
       <Sidebar role="employer" />
 
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col h-screen overflow-y-auto relative">
-
+        
         {/* Subtle Background Glow */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[300px] bg-brand-gold rounded-full mix-blend-multiply filter blur-[150px] opacity-10 pointer-events-none"></div>
 
@@ -43,13 +71,19 @@ const EmployerDashboard = () => {
 
           {/* Stats Overview */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div className="p-6 bg-brand-darkgray border border-gray-800 rounded-xl">
-              <p className="text-gray-400 text-sm mb-1">Active Job Postings</p>
-              <p className="text-4xl font-bold text-white">0</p>
+            <div className="p-6 bg-brand-darkgray border border-gray-800 rounded-xl relative overflow-hidden group">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-brand-gold/5 rounded-full blur-2xl -mr-10 -mt-10 transition-transform group-hover:scale-150"></div>
+              <p className="text-gray-400 text-sm mb-1 relative z-10">Active Job Postings</p>
+              <p className="text-4xl font-bold text-white relative z-10">
+                {loading ? <span className="animate-pulse text-gray-600">...</span> : stats.jobs}
+              </p>
             </div>
-            <div className="p-6 bg-brand-darkgray border border-gray-800 rounded-xl">
-              <p className="text-gray-400 text-sm mb-1">Total Applicants</p>
-              <p className="text-4xl font-bold text-white">0</p>
+            <div className="p-6 bg-brand-darkgray border border-gray-800 rounded-xl relative overflow-hidden group">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-brand-gold/5 rounded-full blur-2xl -mr-10 -mt-10 transition-transform group-hover:scale-150"></div>
+              <p className="text-gray-400 text-sm mb-1 relative z-10">Total Applicants</p>
+              <p className="text-4xl font-bold text-white relative z-10">
+                {loading ? <span className="animate-pulse text-gray-600">...</span> : stats.applicants}
+              </p>
             </div>
           </div>
         </div>
