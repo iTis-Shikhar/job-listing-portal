@@ -7,6 +7,8 @@ import EmployerDashboard from './pages/EmployerDashboard';
 import EmployerProfile from './pages/EmployerProfile';
 import PostJob from './pages/PostJob';
 import SeekerProfile from './pages/SeekerProfile';
+import Applicants from './pages/Applicants';
+import MyApplications from './pages/MyApplications';
 
 function App() {
   return (
@@ -21,6 +23,8 @@ function App() {
         <Route path="/employer-profile" element={<EmployerProfile />} />
         <Route path="/post-job" element={<PostJob />} />
         <Route path="/seeker-profile" element={<SeekerProfile />} />
+        <Route path="/applicants" element={<Applicants />} />
+        <Route path="/my-applications" element={<MyApplications />} />
       </Routes>
     </div>
   );
