@@ -6,6 +6,8 @@ const jobSeekerProfileRoutes = require('./routes/jobSeekerProfileRoutes');
 const employerProfileRoutes = require('./routes/employerProfileRoutes');
 const jobRoutes = require('./routes/jobRoutes');
 const applicationRoutes = require('./routes/applicationRoutes');
+const dashboardRoutes = require('./routes/dashboardRoutes');
+const notificationRoutes = require('./routes/notificationRoutes');
 
 const app = express();
 
@@ -27,5 +29,7 @@ app.use('/api/profile/jobseeker', jobSeekerProfileRoutes);
 app.use('/api/profile/employer', employerProfileRoutes);
 app.use('/api/jobs', jobRoutes);
 app.use('/api/applications', applicationRoutes);
+app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/notifications', notificationRoutes);
 
 module.exports = app;

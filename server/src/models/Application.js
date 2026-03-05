@@ -86,6 +86,6 @@ applicationSchema.index({ job: 1, jobSeeker: 1 }, { unique: true });
 applicationSchema.index({ employer: 1, status: 1 });
 applicationSchema.index({ jobSeeker: 1, status: 1 });
 applicationSchema.index({ job: 1 });
-applicationSchema.index({ 'applicantDetails.email': 1 }); // For manual application tracking
+applicationSchema.index({ 'applicantDetails.email': 1 });
 
 module.exports = mongoose.model('Application', applicationSchema);
