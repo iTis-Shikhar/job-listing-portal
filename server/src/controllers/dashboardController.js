@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const Application = require('../models/Application');
 const Job = require('../models/Job');
 const JobSeekerProfile = require('../models/JobSeekerProfile');
@@ -19,7 +20,7 @@ const calcProfileScore = (profile) => {
         profile.linkedIn,
         profile.portfolio,
         profile.currentJobTitle,
-        profile.yearsOfExperience > 0
+        profile.yearsOfExperience != null && Number.isFinite(profile.yearsOfExperience)
     ];
     const filled = fields.filter(Boolean).length;
     return Math.round((filled / fields.length) * 100);
@@ -112,7 +113,8 @@ const getJobSeekerDashboard = async (req, res) => {
             }
         });
     } catch (error) {
-        res.status(500).json({ success: false, error: error.message });
+        console.error('getJobSeekerDashboard error:', error);
+        res.status(500).json({ success: false, error: 'Internal server error' });
     }
 };
 
@@ -144,18 +146,31 @@ const getEmployerDashboard = async (req, res) => {
         const appQuery = { employer: req.user.id };
         if (sinceDate) appQuery.createdAt = { $gte: sinceDate };
 
-        const allApplications = await Application.find(appQuery)
-            .populate('job', 'title')
-            .populate('jobSeeker', 'name email')
-            .sort({ createdAt: -1 });
+        // Aggregate funnel counts per job (avoids loading all documents into memory)
+        const appStats = await Application.aggregate([
+            { $match: appQuery },
+            {
+                $group: {
+                    _id: { job: '$job', status: '$status' },
+                    count: { $sum: 1 }
+                }
+            }
+        ]);
 
-        // Applications per job (with funnel)
-        const appsByJob = allApplications.reduce((acc, app) => {
-            const jobId = app.job?._id?.toString();
+        // Fetch only the most recent applications (bounded)
+        const recentApplications = await Application.find(appQuery)
+            .populate('job', 'title')
+            .populate('jobSeeker', 'name')
+            .sort({ createdAt: -1 })
+            .limit(10);
+
+        // Build appsByJob map from aggregation results
+        const appsByJob = appStats.reduce((acc, item) => {
+            const jobId = item._id.job?.toString();
             if (!jobId) return acc;
             if (!acc[jobId]) acc[jobId] = { total: 0, funnel: {} };
-            acc[jobId].total += 1;
-            acc[jobId].funnel[app.status] = (acc[jobId].funnel[app.status] || 0) + 1;
+            acc[jobId].total += item.count;
+            acc[jobId].funnel[item._id.status] = item.count;
             return acc;
         }, {});
 
@@ -194,8 +209,8 @@ const getEmployerDashboard = async (req, res) => {
                     listings
                 },
                 applications: {
-                    total: allApplications.length,
-                    recent: allApplications.slice(0, 5)
+                    total: appStats.reduce((sum, s) => sum + s.count, 0),
+                    recent: recentApplications.slice(0, 5)
                 },
                 notifications: {
                     unreadCount: unreadNotifications,
@@ -204,7 +219,8 @@ const getEmployerDashboard = async (req, res) => {
             }
         });
     } catch (error) {
-        res.status(500).json({ success: false, error: error.message });
+        console.error('getEmployerDashboard error:', error);
+        res.status(500).json({ success: false, error: 'Internal server error' });
     }
 };
 

@@ -105,13 +105,13 @@ const applyToJob = async (req, res) => {
             applicantDetails: finalApplicantDetails
         });
 
-        // 🔔 Notify the employer about the new application
-        await createNotification(
+        // 🔔 Notify the employer about the new application (fire-and-forget)
+        createNotification(
             job.employer,
             'APPLICATION_RECEIVED',
             `New application received for "${job.title}"`,
             { refModel: 'Application', refId: application._id }
-        );
+        ).catch(err => console.error('Notification error (applyToJob):', err.message));
 
         res.status(201).json({
             success: true,
@@ -192,7 +192,7 @@ const updateApplicationStatus = async (req, res) => {
     try {
         const { status, note } = req.body;
 
-        let application = await Application.findById(req.params.id);
+        let application = await Application.findById(req.params.id).populate('job', 'title');
 
         if (!application) {
             return res.status(404).json({
@@ -226,13 +226,16 @@ const updateApplicationStatus = async (req, res) => {
 
         // 🔔 Notify the job seeker about the status change
         if (status !== previousStatus) {
-            const job = await Job.findById(application.job).select('title');
-            await createNotification(
-                application.jobSeeker,
-                'APPLICATION_STATUS',
-                `Your application for "${job?.title || 'a job'}" has been updated to: ${status}`,
-                { refModel: 'Application', refId: application._id }
-            );
+            try {
+                await createNotification(
+                    application.jobSeeker,
+                    'APPLICATION_STATUS',
+                    `Your application for "${application.job?.title || 'a job'}" has been updated to: ${status}`,
+                    { refModel: 'Application', refId: application._id }
+                );
+            } catch (notifErr) {
+                console.error('Notification error (updateApplicationStatus):', notifErr.message);
+            }
         }
 
         res.status(200).json({

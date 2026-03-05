@@ -1,5 +1,6 @@
 const Job = require('../models/Job');
 const EmployerProfile = require('../models/EmployerProfile');
+const JobSeekerProfile = require('../models/JobSeekerProfile');
 
 // @desc    Create a new job listing
 // @route   POST /api/jobs
@@ -360,7 +361,6 @@ const toggleSaveJob = async (req, res) => {
             return res.status(404).json({ success: false, error: 'Job not found' });
         }
 
-        const JobSeekerProfile = require('../models/JobSeekerProfile');
         const profile = await JobSeekerProfile.findOne({ user: req.user.id });
         if (!profile) {
             return res.status(404).json({

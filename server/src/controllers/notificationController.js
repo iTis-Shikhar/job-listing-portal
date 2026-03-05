@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const Notification = require('../models/Notification');
 
 // @desc    Get notifications for logged-in user
@@ -34,6 +35,10 @@ const getNotifications = async (req, res) => {
 // @access  Private
 const markAsRead = async (req, res) => {
     try {
+        if (!mongoose.isValidObjectId(req.params.id)) {
+            return res.status(400).json({ success: false, error: 'Invalid notification id' });
+        }
+
         const notification = await Notification.findOne({
             _id: req.params.id,
             recipient: req.user.id  // ensure ownership
@@ -76,6 +81,10 @@ const markAllAsRead = async (req, res) => {
 // @access  Private
 const deleteNotification = async (req, res) => {
     try {
+        if (!mongoose.isValidObjectId(req.params.id)) {
+            return res.status(400).json({ success: false, error: 'Invalid notification id' });
+        }
+
         const notification = await Notification.findOneAndDelete({
             _id: req.params.id,
             recipient: req.user.id
