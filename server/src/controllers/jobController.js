@@ -343,6 +343,59 @@ const updateJobStatus = async (req, res) => {
     }
 };
 
+// @desc    Toggle save/unsave a job
+// @route   POST /api/jobs/:id/save
+// @access  Private (Job Seeker only)
+const toggleSaveJob = async (req, res) => {
+    try {
+        if (req.user.role !== 'user') {
+            return res.status(403).json({
+                success: false,
+                error: 'Only job seekers can save jobs'
+            });
+        }
+
+        const job = await Job.findById(req.params.id);
+        if (!job) {
+            return res.status(404).json({ success: false, error: 'Job not found' });
+        }
+
+        const JobSeekerProfile = require('../models/JobSeekerProfile');
+        const profile = await JobSeekerProfile.findOne({ user: req.user.id });
+        if (!profile) {
+            return res.status(404).json({
+                success: false,
+                error: 'Please create your profile first'
+            });
+        }
+
+        const alreadySaved = profile.savedJobs.some(
+            id => id.toString() === req.params.id
+        );
+
+        if (alreadySaved) {
+            profile.savedJobs = profile.savedJobs.filter(
+                id => id.toString() !== req.params.id
+            );
+        } else {
+            profile.savedJobs.push(req.params.id);
+        }
+
+        await profile.save();
+
+        res.status(200).json({
+            success: true,
+            saved: !alreadySaved,
+            message: alreadySaved ? 'Job removed from saved list' : 'Job saved successfully'
+        });
+    } catch (error) {
+        if (error.kind === 'ObjectId') {
+            return res.status(404).json({ success: false, error: 'Job not found' });
+        }
+        res.status(500).json({ success: false, error: error.message });
+    }
+};
+
 module.exports = {
     createJob,
     getAllJobs,
@@ -350,5 +403,6 @@ module.exports = {
     getEmployerJobs,
     updateJob,
     deleteJob,
-    updateJobStatus
+    updateJobStatus,
+    toggleSaveJob
 };

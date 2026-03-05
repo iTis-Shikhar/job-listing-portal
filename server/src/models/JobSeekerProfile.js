@@ -78,6 +78,11 @@ const jobSeekerProfileSchema = new mongoose.Schema({
         type: String,
         maxlength: [500, 'Bio cannot exceed 500 characters']
     },
+    // Saved / Bookmarked Jobs
+    savedJobs: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Job'
+    }],
     createdAt: {
         type: Date,
         default: Date.now

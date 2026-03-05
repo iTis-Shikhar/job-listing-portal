@@ -4,186 +4,251 @@ Backend REST API for the Job Listing Portal, built with **Express.js** and **Mon
 
 ## Tech Stack
 
-- **Runtime:** Node.js
-- **Framework:** Express 5
-- **Database:** MongoDB (via Mongoose)
-- **Authentication:** JWT (JSON Web Tokens)
-- **Password Hashing:** bcryptjs
+| Layer | Technology |
+|---|---|
+| Runtime | Node.js v18+ |
+| Framework | Express 5 |
+| Database | MongoDB (Mongoose) |
+| Auth | JWT (30-day tokens) |
+| Password Hashing | bcryptjs |
+| File Storage | ImageKit (cloud) |
+| File Upload | Multer (memory storage) |
+
+---
 
 ## Project Structure
 
 ```
 server/
 ├── src/
-│   ├── app.js                      # Express app configuration
+│   ├── app.js                          # Express app + route registration
 │   ├── config/
-│   │   └── db.js                   # MongoDB connection setup
+│   │   ├── db.js                       # MongoDB connection
+│   │   └── imagekit.config.js          # ImageKit SDK setup
 │   ├── controllers/
-│   │   ├── authController.js       # Register & login logic
-│   │   ├── jobController.js        # Job CRUD operations
+│   │   ├── authController.js           # Register & login
+│   │   ├── jobController.js            # Job CRUD + save/unsave toggle
 │   │   ├── jobSeekerProfileController.js
-│   │   └── employerProfileController.js
+│   │   ├── employerProfileController.js
+│   │   ├── applicationController.js    # Apply, view, update status
+│   │   ├── dashboardController.js      # Aggregated dashboards
+│   │   └── notificationController.js   # Notification management
 │   ├── middleware/
-│   │   ├── authMiddleware.js       # JWT auth guard
-│   │   └── upload.js               # File upload middleware
+│   │   ├── authMiddleware.js           # JWT protect guard
+│   │   └── upload.js                   # Multer memory storage middleware
 │   ├── models/
-│   │   ├── User.js                 # User schema & password hashing
-│   │   ├── Job.js                  # Job listing schema
-│   │   ├── JobSeekerProfile.js     # Job seeker profile schema
-│   │   └── EmployerProfile.js      # Employer profile schema
+│   │   ├── User.js
+│   │   ├── Job.js
+│   │   ├── JobSeekerProfile.js
+│   │   ├── EmployerProfile.js
+│   │   ├── Application.js
+│   │   └── Notification.js
 │   ├── routes/
-│   │   ├── authRoutes.js           # POST /api/auth/register & /login
-│   │   ├── userRoutes.js           # GET /api/user/profile (protected)
-│   │   ├── jobRoutes.js            # Job listing endpoints
+│   │   ├── authRoutes.js
+│   │   ├── userRoutes.js
+│   │   ├── jobRoutes.js
 │   │   ├── jobSeekerProfileRoutes.js
-│   │   └── employerProfileRoutes.js
+│   │   ├── employerProfileRoutes.js
+│   │   ├── applicationRoutes.js
+│   │   ├── dashboardRoutes.js
+│   │   └── notificationRoutes.js
 │   └── utils/
-│       ├── generateToken.js        # JWT token generator (30-day expiry)
-│       └── imagekitUpload.js       # ImageKit file upload utility
-├── .env                            # Environment variables (not committed)
-├── .env.example                    # Example environment variables
+│       ├── generateToken.js
+│       └── imagekitUpload.js
+├── .env
+├── .env.example
 ├── package.json
-└── server.js                       # Server entry point
-
+└── server.js
 ```
+
+---
 
 ## Getting Started
 
 ### Prerequisites
 
-- [Node.js](https://nodejs.org/) (v18+ recommended)
-- A MongoDB Atlas cluster or local MongoDB instance
+- [Node.js](https://nodejs.org/) v18+
+- MongoDB Atlas cluster or local MongoDB
+- [ImageKit](https://imagekit.io/) account (for file uploads)
 
 ### Installation
 
 ```bash
-# Clone the repo & navigate to the server directory
 cd server
-
-# Install dependencies
 npm install
 ```
 
 ### Environment Variables
 
-Create a `.env` file in the `server/` directory:
+Create a `.env` file in `server/`:
 
 ```env
 PORT=5000
 MONGO_URI=your_mongodb_connection_string
 JWT_SECRET=your_jwt_secret_key
+IMAGEKIT_PUBLIC_KEY=your_imagekit_public_key
+IMAGEKIT_PRIVATE_KEY=your_imagekit_private_key
+IMAGEKIT_URL_ENDPOINT=https://ik.imagekit.io/your_id
 ```
 
 ### Running the Server
 
 ```bash
-# Development (with auto-reload via nodemon)
+# Development (with nodemon auto-reload)
 npm run dev
 
 # Production
 npm start
 ```
 
-The server will start at **http://localhost:5000**.
+Server runs at **http://localhost:5000**
 
-## API Endpoints
+---
 
-### Auth Routes — `/api/auth`
+## API Reference
 
-| Method | Endpoint    | Description             | Access |
-| ------ | ----------- | ----------------------- | ------ |
-| POST   | `/register` | Register a new user     | Public |
-| POST   | `/login`    | Login & receive a token | Public |
+> All **Private** routes require `Authorization: Bearer <token>` header.
 
-### User Routes — `/api/user`
+### Auth — `/api/auth`
 
-| Method | Endpoint   | Description      | Access  |
-| ------ | ---------- | ---------------- | ------- |
-| GET    | `/profile` | Get user profile | Private |
+| Method | Endpoint | Description | Access |
+|---|---|---|---|
+| POST | `/register` | Register a new user | Public |
+| POST | `/login` | Login & receive JWT | Public |
 
-### Job Routes — `/api/jobs`
+### User — `/api/user`
 
-| Method | Endpoint           | Description                   | Access  |
-| ------ | ------------------ | ----------------------------- | ------- |
-| POST   | `/`                | Create a new job listing      | Private (Employer) |
-| GET    | `/`                | Get all active jobs (paginated) | Public |
-| GET    | `/:id`             | Get job by ID                 | Public |
-| GET    | `/employer/me`     | Get current employer's jobs   | Private (Employer) |
-| PUT    | `/:id`             | Update job listing            | Private (Employer, own jobs) |
-| PATCH  | `/:id/status`      | Update job status             | Private (Employer, own jobs) |
-| DELETE | `/:id`             | Delete job (soft delete)      | Private (Employer, own jobs) |
+| Method | Endpoint | Description | Access |
+|---|---|---|---|
+| GET | `/profile` | Get current user info | Private |
 
-> **Private** routes require a `Bearer` token in the `Authorization` header.
+### Job Seeker Profile — `/api/profile/jobseeker`
 
-### Request / Response Examples
+| Method | Endpoint | Description | Access |
+|---|---|---|---|
+| POST | `/` | Create profile (with resume upload) | Private |
+| GET | `/me` | Get own profile | Private |
+| GET | `/:id` | Get profile by ID | Public |
+| PUT | `/` | Update profile (with resume replace) | Private |
+| DELETE | `/` | Delete profile | Private |
 
-#### Register
+### Employer Profile — `/api/profile/employer`
 
-```
-POST /api/auth/register
-Content-Type: application/json
+| Method | Endpoint | Description | Access |
+|---|---|---|---|
+| POST | `/` | Create company profile | Private |
+| GET | `/me` | Get own company profile | Private |
+| GET | `/:id` | Get company profile by ID | Public |
+| PUT | `/` | Update company profile | Private |
+| DELETE | `/` | Delete company profile | Private |
 
-{
-  "name": "John Doe",
-  "email": "john@example.com",
-  "password": "secret123",
-  "role": "user"          // optional — "user" (default) or "employer"
-}
-```
+### Jobs — `/api/jobs`
 
-**Success (201):**
+| Method | Endpoint | Description | Access |
+|---|---|---|---|
+| GET | `/` | Get all active jobs (search + filter + paginate) | Public |
+| GET | `/:id` | Get job by ID | Public |
+| GET | `/employer/me` | Get current employer's jobs | Private (Employer) |
+| POST | `/` | Create job listing | Private (Employer) |
+| PUT | `/:id` | Update job listing | Private (Employer, own) |
+| DELETE | `/:id` | Soft-delete job (→ Closed) | Private (Employer, own) |
+| PATCH | `/:id/status` | Set job status (Active/Inactive/Closed) | Private (Employer, own) |
+| POST | `/:id/save` | Toggle save/unsave a job | Private (Job Seeker) |
 
+**Search & Filter Params** (`GET /api/jobs`):
+
+| Param | Description |
+|---|---|
+| `keyword` | Search title, description, skills |
+| `location` | Filter by city/state/country |
+| `jobType` | Filter by job type |
+| `minSalary` | Filter by minimum salary |
+| `page` | Page number (default: 1) |
+| `limit` | Results per page (default: 10) |
+
+### Applications — `/api/applications`
+
+| Method | Endpoint | Description | Access |
+|---|---|---|---|
+| POST | `/` | Apply to a job (multipart/form-data with `resume`) | Private (Job Seeker) |
+| GET | `/my-applications` | Get own applications | Private (Job Seeker) |
+| GET | `/employer/me` | Get applications for employer's jobs | Private (Employer) |
+| PATCH | `/:id/status` | Update application status + add note | Private (Employer) |
+
+**Application Statuses:** `Applied → Reviewed → Shortlisted → Interviewing → Rejected / Accepted / Withdrawn`
+
+**Application Sources:** `Profile` (from saved profile) | `Manual` (user-entered) | `Auto-detect` (from resume)
+
+### Dashboard — `/api/dashboard`
+
+| Method | Endpoint | Description | Access |
+|---|---|---|---|
+| GET | `/jobseeker` | Job seeker dashboard | Private (Job Seeker) |
+| GET | `/employer` | Employer dashboard | Private (Employer) |
+
+**Query Param:** `?period=7d|30d|all` (filters application stats by time window, default: `all`)
+
+**Job Seeker Dashboard returns:**
 ```json
 {
-  "_id": "...",
-  "name": "John Doe",
-  "email": "john@example.com",
-  "role": "user",
-  "token": "eyJhbGciOiJIUzI1NiIs..."
+  "profile": {},
+  "profileCompletionScore": 75,
+  "applications": { "total": 5, "byStatus": { "Applied": 2 }, "recent": [] },
+  "savedJobs": [],
+  "notifications": { "unreadCount": 3, "recent": [] }
 }
 ```
 
-#### Login
-
-```
-POST /api/auth/login
-Content-Type: application/json
-
-{
-  "email": "john@example.com",
-  "password": "secret123"
-}
-```
-
-**Success (200):** Same shape as the register response.
-
-#### Get Profile
-
-```
-GET /api/user/profile
-Authorization: Bearer <token>
-```
-
-**Success (200):**
-
+**Employer Dashboard returns:**
 ```json
 {
-  "_id": "...",
-  "name": "John Doe",
-  "email": "john@example.com",
-  "role": "user"
+  "profile": {},
+  "jobs": {
+    "total": 4,
+    "byStatus": { "Active": 3, "Closed": 1 },
+    "listings": [ { "title": "...", "applicationCount": 10, "funnel": { "Applied": 7, "Shortlisted": 3 } } ]
+  },
+  "applications": { "total": 12, "recent": [] },
+  "notifications": { "unreadCount": 2, "recent": [] }
 }
 ```
 
-## User Model
+### Notifications — `/api/notifications`
 
-| Field      | Type   | Details                             |
-| ---------- | ------ | ----------------------------------- |
-| name       | String | Required                            |
-| email      | String | Required, unique, validated          |
-| password   | String | Required, min 6 chars, hashed       |
-| role       | String | `"user"` (default) or `"employer"`  |
-| createdAt  | Date   | Auto-generated                      |
+| Method | Endpoint | Description | Access |
+|---|---|---|---|
+| GET | `/` | Get notifications (`?unreadOnly=true`) | Private |
+| PATCH | `/read-all` | Mark all as read | Private |
+| PATCH | `/:id/read` | Mark one as read | Private |
+| DELETE | `/:id` | Delete a notification | Private |
+
+**Auto-triggered:**
+- Employer ← `APPLICATION_RECEIVED` when a job seeker applies
+- Job Seeker ← `APPLICATION_STATUS` when employer updates their status
+
+---
+
+## Data Models Summary
+
+### User
+`name` · `email` · `password` (hashed) · `role` (user/employer)
+
+### JobSeekerProfile
+`fullName` · `phone` · `location` · `resume` (ImageKit) · `skills[]` · `bio` · `linkedIn` · `portfolio` · `currentJobTitle` · `yearsOfExperience` · `savedJobs[]`
+
+### EmployerProfile
+`companyName` · `industry` · `companySize` · `foundedYear` · `website` · `about` · `address` · `socialLinks`
+
+### Job
+`title` · `description` · `requirements` · `location` · `jobType` · `salaryRange` · `status` (Active/Inactive/Closed) · `employer` · `employerProfile`
+
+### Application
+`job` · `jobSeeker` · `employer` · `resume` (ImageKit: fileId, url) · `source` · `applicantDetails` · `coverLetter` · `status` · `notes[]`
+
+### Notification
+`recipient` · `type` · `message` · `read` · `refModel` · `refId`
+
+---
 
 ## License
 
