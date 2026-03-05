@@ -65,34 +65,64 @@ const createJob = async (req, res) => {
 // @access  Public
 const getAllJobs = async (req, res) => {
     try {
-        // Pagination
-        const page = parseInt(req.query.page, 10) || 1;
-        const limit = parseInt(req.query.limit, 10) || 10;
-        const skip = (page - 1) * limit;
+        const { keyword, location, jobType, minSalary, page, limit } = req.query;
 
-        // Filter by status (default to Active for public access)
-        const status = req.query.status || 'Active';
-        const filter = { status };
+        // Build query object
+        const query = { status: 'Active' };
+
+        // Keyword search (title, description, skills)
+        if (keyword) {
+            query.$or = [
+                { title: { $regex: keyword, $options: 'i' } },
+                { description: { $regex: keyword, $options: 'i' } },
+                { 'requirements.skills': { $regex: keyword, $options: 'i' } }
+            ];
+        }
+
+        // Location filter
+        if (location) {
+            query.$or = [
+                ...(query.$or || []),
+                { 'location.city': { $regex: location, $options: 'i' } },
+                { 'location.state': { $regex: location, $options: 'i' } },
+                { 'location.country': { $regex: location, $options: 'i' } }
+            ];
+        }
+
+        // Job Type filter
+        if (jobType) {
+            query.jobType = jobType;
+        }
+
+        // Salary filter
+        if (minSalary) {
+            query['salaryRange.min'] = { $gte: Number(minSalary) };
+        }
+
+        // Pagination
+        const pageNum = parseInt(page, 10) || 1;
+        const limitNum = parseInt(limit, 10) || 10;
+        const skip = (pageNum - 1) * limitNum;
 
         // Count total documents
-        const total = await Job.countDocuments(filter);
+        const total = await Job.countDocuments(query);
 
         // Get jobs with pagination
-        const jobs = await Job.find(filter)
+        const jobs = await Job.find(query)
             .populate('employer', 'name email')
             .populate('employerProfile', 'companyName industry website location')
             .sort({ createdAt: -1 })
             .skip(skip)
-            .limit(limit)
+            .limit(limitNum)
             .lean();
 
         res.status(200).json({
             success: true,
             count: jobs.length,
             pagination: {
-                page,
-                limit,
-                totalPages: Math.ceil(total / limit),
+                page: pageNum,
+                limit: limitNum,
+                totalPages: Math.ceil(total / limitNum),
                 total
             },
             data: jobs
