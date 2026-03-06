@@ -28,10 +28,10 @@ const Signup = () => {
   };
 
   return (
-    <div className="relative min-h-screen bg-brand-black flex items-center justify-center p-4 overflow-hidden">
+    <div className="relative min-h-screen bg-brand-bg flex items-center justify-center p-4 overflow-hidden font-sans">
       
-      {/* --- NEW: Back to Home Button --- */}
-      <Link to="/" className="absolute top-6 left-6 md:top-8 md:left-8 flex items-center gap-2 text-gray-400 hover:text-brand-gold transition-colors z-20 font-sans font-medium text-sm group">
+      {/* Back to Home Button */}
+      <Link to="/" className="absolute top-6 left-6 md:top-8 md:left-8 flex items-center gap-2 text-brand-muted hover:text-brand-primary transition-colors z-20 font-medium text-sm group">
         <svg className="w-5 h-5 transform group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
         </svg>
@@ -39,61 +39,61 @@ const Signup = () => {
       </Link>
 
       {/* Blurred Background Elements */}
-      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-brand-gold rounded-full mix-blend-multiply filter blur-[150px] opacity-20"></div>
+      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-brand-primary rounded-full filter blur-[150px] opacity-[0.05]"></div>
       
-      {/* Glassmorphism Card */}
-      <div className="relative z-10 w-full max-w-md bg-brand-darkgray/60 backdrop-blur-xl border border-gray-800 p-8 rounded-2xl shadow-2xl">
+      {/* Main Card */}
+      <div className="relative z-10 w-full max-w-md bg-brand-surface border border-brand-border p-8 rounded-2xl shadow-lg">
         <div className="text-center mb-8">
-          <h2 className="text-3xl font-heading font-bold text-white mb-2">Create Account</h2>
-          <p className="text-gray-400 font-sans text-sm">Join HireSphere today</p>
+          <h2 className="text-3xl font-bold text-brand-text mb-2">Create Account</h2>
+          <p className="text-brand-muted text-sm">Join Profilia today</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-1">Full Name</label>
+            <label className="block text-sm font-semibold text-brand-text mb-1">Full Name</label>
             <input 
               type="text" name="name" onChange={handleChange} required
-              className="w-full px-4 py-3 bg-brand-black border border-gray-700 rounded-lg focus:outline-none focus:border-brand-gold text-white transition-colors"
+              className="w-full px-4 py-3 bg-brand-bg border border-brand-border rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-primary/20 focus:border-brand-primary text-brand-text transition-all"
               placeholder="John Doe"
             />
           </div>
           
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-1">Email Address</label>
+            <label className="block text-sm font-semibold text-brand-text mb-1">Email Address</label>
             <input 
               type="email" name="email" onChange={handleChange} required
-              className="w-full px-4 py-3 bg-brand-black border border-gray-700 rounded-lg focus:outline-none focus:border-brand-gold text-white transition-colors"
+              className="w-full px-4 py-3 bg-brand-bg border border-brand-border rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-primary/20 focus:border-brand-primary text-brand-text transition-all"
               placeholder="you@example.com"
             />
           </div>
           
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-1">Password</label>
+            <label className="block text-sm font-semibold text-brand-text mb-1">Password</label>
             <input 
               type="password" name="password" onChange={handleChange} required
-              className="w-full px-4 py-3 bg-brand-black border border-gray-700 rounded-lg focus:outline-none focus:border-brand-gold text-white transition-colors"
+              className="w-full px-4 py-3 bg-brand-bg border border-brand-border rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-primary/20 focus:border-brand-primary text-brand-text transition-all"
               placeholder="••••••••"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-1">I am a...</label>
+            <label className="block text-sm font-semibold text-brand-text mb-1">I am a...</label>
             <select 
               name="role" onChange={handleChange} 
-              className="w-full px-4 py-3 bg-brand-black border border-gray-700 rounded-lg focus:outline-none focus:border-brand-gold text-white transition-colors cursor-pointer"
+              className="w-full px-4 py-3 bg-brand-bg border border-brand-border rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-primary/20 focus:border-brand-primary text-brand-text transition-all cursor-pointer"
             >
               <option value="user">Job Seeker</option>
               <option value="employer">Employer</option>
             </select>
           </div>
 
-          <button type="submit" className="w-full py-3 mt-6 bg-brand-gold text-brand-black font-bold rounded-lg hover:bg-yellow-500 transition-colors hover:shadow-[0_0_15px_rgba(197,157,95,0.4)]">
+          <button type="submit" className="w-full py-3 mt-6 bg-brand-primary text-white font-semibold rounded-lg hover:bg-brand-primaryHover transition-all shadow-sm active:scale-95">
             Sign Up
           </button>
         </form>
 
-        <p className="mt-6 text-center text-gray-400 text-sm">
-          Already have an account? <Link to="/login" className="text-brand-gold hover:underline font-medium">Log in</Link>
+        <p className="mt-6 text-center text-brand-muted text-sm">
+          Already have an account? <Link to="/login" className="text-brand-primary hover:underline font-semibold">Log in</Link>
         </p>
       </div>
     </div>

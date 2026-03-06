@@ -1,6 +1,6 @@
-# HireSphere - Modern Job Listing Portal
+# Profilia - Modern Job Listing Portal
 
-HireSphere is a full-stack web application designed to seamlessly connect employers with top talent. Built with the MERN stack, it features secure role-based authentication, cloud-based resume management, and a real-time application tracking system.
+Profilia is a full-stack web application designed to seamlessly connect employers with top talent. Built with the MERN stack, it features secure role-based authentication, cloud-based resume management, and a real-time application tracking system.
 
 ## 🚀 Key Features
 
