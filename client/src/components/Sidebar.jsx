@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 
 const Sidebar = ({ role }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -26,12 +27,12 @@ const Sidebar = ({ role }) => {
       ];
 
   return (
-    <div className={`h-screen bg-brand-darkgray border-r border-gray-800 transition-all duration-300 flex flex-col ${isCollapsed ? 'w-20' : 'w-64'}`}>
+    <div className={`h-screen bg-brand-surface border-r border-brand-border transition-all duration-300 flex flex-col ${isCollapsed ? 'w-20' : 'w-64'} shadow-sm`}>
       
       {/* Collapse Toggle Button */}
       <div className="p-4 flex justify-end">
-        <button onClick={() => setIsCollapsed(!isCollapsed)} className="text-gray-400 hover:text-brand-gold transition-colors">
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <button onClick={() => setIsCollapsed(!isCollapsed)} className="text-brand-muted hover:text-brand-primary transition-colors bg-brand-bg hover:bg-blue-50 p-1.5 rounded-md">
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
           </svg>
         </button>
@@ -39,23 +40,42 @@ const Sidebar = ({ role }) => {
 
       {/* Navigation Links */}
       <nav className="flex-1 px-3 space-y-2 mt-4">
-        {menuItems.map((item, index) => (
-          <Link key={index} to={item.path} className="flex items-center gap-4 px-3 py-3 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-colors group">
-            <svg className="w-6 h-6 group-hover:text-brand-gold flex-shrink-0 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={item.icon} />
-            </svg>
-            {!isCollapsed && <span className="font-medium whitespace-nowrap">{item.name}</span>}
-          </Link>
-        ))}
+        {menuItems.map((item, index) => {
+          const isActive = location.pathname === item.path;
+          
+          return (
+            <Link 
+              key={index} 
+              to={item.path} 
+              className={`flex items-center gap-4 px-3 py-3 rounded-lg transition-colors group ${
+                isActive 
+                  ? 'bg-blue-50 text-brand-primary font-semibold' 
+                  : 'text-brand-muted hover:text-brand-text hover:bg-brand-bg font-medium'
+              }`}
+            >
+              <svg 
+                className={`w-6 h-6 flex-shrink-0 transition-colors ${
+                  isActive ? 'text-brand-primary' : 'group-hover:text-brand-primary'
+                }`} 
+                fill="none" 
+                stroke="currentColor" 
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={item.icon} />
+              </svg>
+              {!isCollapsed && <span className="whitespace-nowrap">{item.name}</span>}
+            </Link>
+          )
+        })}
       </nav>
 
       {/* Logout Button */}
-      <div className="p-4 border-t border-gray-800">
-        <button onClick={handleLogout} className="flex items-center gap-4 px-3 py-3 text-red-400 hover:text-red-300 hover:bg-red-400/10 w-full rounded-lg transition-colors group">
+      <div className="p-4 border-t border-brand-border bg-brand-surface">
+        <button onClick={handleLogout} className="flex items-center gap-4 px-3 py-3 text-red-600 hover:text-red-700 hover:bg-red-50 w-full rounded-lg transition-colors group font-medium">
           <svg className="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
           </svg>
-          {!isCollapsed && <span className="font-medium whitespace-nowrap">Logout</span>}
+          {!isCollapsed && <span className="whitespace-nowrap">Logout</span>}
         </button>
       </div>
     </div>
