@@ -5,10 +5,7 @@ const JobSeekerProfile = require('../models/JobSeekerProfile');
 const EmployerProfile = require('../models/EmployerProfile');
 const Notification = require('../models/Notification');
 
-/**
- * Calculate profile completion score for a job seeker (0-100)
- * Based on 9 trackable fields
- */
+//  Calculate profile completion score for a job seeker (0-100)
 const calcProfileScore = (profile) => {
     if (!profile) return 0;
     const fields = [
@@ -43,7 +40,6 @@ const getPeriodFilter = (period) => {
 
 // @desc    Get job seeker dashboard
 // @route   GET /api/dashboard/jobseeker?period=7d|30d|all
-// @access  Private (Job Seeker only)
 const getJobSeekerDashboard = async (req, res) => {
     try {
         if (req.user.role !== 'user') {

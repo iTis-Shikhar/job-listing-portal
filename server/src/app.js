@@ -16,8 +16,10 @@ const connectDB = require('./config/db');
 connectDB();
 
 app.use(express.json());
-app.use(cors());
-
+app.use(cors({
+  origin: process.env.CLIENT_URL,
+  credentials: true
+}));
 
 app.get('/', (req, res) => {
     res.send('Server is running');
