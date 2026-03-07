@@ -1,14 +1,14 @@
-import { Route, Routes } from 'react-router-dom';
-import Applicants from './pages/Applicants';
-import EmployerDashboard from './pages/EmployerDashboard';
-import EmployerProfile from './pages/EmployerProfile';
+import { Routes, Route } from 'react-router-dom';
 import Home from './pages/Home';
 import Login from './pages/Login';
-import MyApplications from './pages/MyApplications';
-import PostJob from './pages/PostJob';
-import SeekerDashboard from './pages/SeekerDashboard';
-import SeekerProfile from './pages/SeekerProfile';
 import Signup from './pages/Signup';
+import SeekerDashboard from './pages/SeekerDashboard';
+import EmployerDashboard from './pages/EmployerDashboard';
+import EmployerProfile from './pages/EmployerProfile';
+import PostJob from './pages/PostJob';
+import SeekerProfile from './pages/SeekerProfile';
+import Applicants from './pages/Applicants';
+import MyApplications from './pages/MyApplications';
 
 function App() {
   return (
