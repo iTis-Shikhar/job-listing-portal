@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import axiosInstance from '../api/axiosInstance';
 import Sidebar from '../components/Sidebar';
 
 const MyApplications = () => {
@@ -10,7 +10,7 @@ const MyApplications = () => {
     const fetchMyApplications = async () => {
       try {
         const token = localStorage.getItem('token');
-        const res = await axios.get('http://localhost:5000/api/applications/my-applications', {
+        const res = await axiosInstance.get('/applications/my-applications', {
           headers: { Authorization: `Bearer ${token}` }
         });
         setApplications(res.data.data || []);

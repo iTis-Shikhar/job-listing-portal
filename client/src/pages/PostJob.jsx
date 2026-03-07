@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import axios from 'axios';
+import axiosInstance from '../api/axiosInstance';
 import { useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 
@@ -54,7 +54,7 @@ const PostJob = () => {
           jobData.applicationDeadline = formData.applicationDeadline;
       }
 
-      await axios.post('http://localhost:5000/api/jobs', jobData, config);
+      await axiosInstance.post('/jobs', jobData, config);
       alert('Job Posted Successfully!');
       navigate('/employer-dashboard');
       

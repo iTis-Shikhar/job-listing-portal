@@ -4,10 +4,9 @@ const JobSeekerProfile = require('../models/JobSeekerProfile');
 const { uploadToImageKit, FOLDERS } = require('../utils/imagekitUpload');
 const { createNotification } = require('./notificationController');
 
-/**
- * Build resume filename consistent with jobSeekerProfileController:
- * e.g. CV_Chiranjit-Das.pdf
- */
+
+//   Build resume filename consistent:
+
 const getResumeFileName = (originalName, fullName) => {
     const lastDot = originalName.lastIndexOf('.');
     const base = lastDot > 0 ? originalName.slice(0, lastDot) : originalName;
@@ -21,12 +20,11 @@ const getResumeFileName = (originalName, fullName) => {
 
 // @desc    Apply to a job
 // @route   POST /api/applications
-// @access  Private (Job Seeker only)
+
 const applyToJob = async (req, res) => {
     try {
         const { jobId, coverLetter, source, applicantDetails } = req.body;
 
-        // Check if file exists
         if (!req.file) {
             return res.status(400).json({
                 success: false,
@@ -34,7 +32,6 @@ const applyToJob = async (req, res) => {
             });
         }
 
-        // Check if user is a job seeker
         if (req.user.role !== 'user') {
             return res.status(403).json({
                 success: false,
@@ -42,7 +39,6 @@ const applyToJob = async (req, res) => {
             });
         }
 
-        // Check if job exists and is active
         const job = await Job.findById(jobId);
         if (!job || job.status !== 'Active') {
             return res.status(404).json({
@@ -51,7 +47,6 @@ const applyToJob = async (req, res) => {
             });
         }
 
-        // Check if job seeker has a profile (required for 'Profile' source)
         const jobSeekerProfile = await JobSeekerProfile.findOne({ user: req.user.id });
         if (source === 'Profile' && !jobSeekerProfile) {
             return res.status(400).json({
@@ -60,7 +55,6 @@ const applyToJob = async (req, res) => {
             });
         }
 
-        // Check if already applied
         const existingApplication = await Application.findOne({
             job: jobId,
             jobSeeker: req.user.id
@@ -73,13 +67,11 @@ const applyToJob = async (req, res) => {
             });
         }
 
-        // Prepare applicant details based on source
         let finalApplicantDetails = {};
         if (source === 'Manual' || source === 'Auto-detect') {
             finalApplicantDetails = typeof applicantDetails === 'string' ? JSON.parse(applicantDetails) : applicantDetails;
         }
 
-        // Upload resume to ImageKit
         const applicantName = finalApplicantDetails?.name || req.user.name || '';
         const resumeFileName = getResumeFileName(req.file.originalname, applicantName);
         const uploadResult = await uploadToImageKit(
@@ -88,7 +80,6 @@ const applyToJob = async (req, res) => {
             FOLDERS.RESUMES
         );
 
-        // Create application
         const application = await Application.create({
             job: jobId,
             jobSeeker: req.user.id,
@@ -127,7 +118,6 @@ const applyToJob = async (req, res) => {
 
 // @desc    Get applications for logged in job seeker
 // @route   GET /api/applications/my-applications
-// @access  Private (Job Seeker only)
 const getJobSeekerApplications = async (req, res) => {
     try {
         const applications = await Application.find({ jobSeeker: req.user.id })
@@ -156,7 +146,6 @@ const getJobSeekerApplications = async (req, res) => {
 
 // @desc    Get applications for an employer's jobs
 // @route   GET /api/applications/employer/me
-// @access  Private (Employer only)
 const getEmployerApplications = async (req, res) => {
     try {
         const { jobId } = req.query;
@@ -187,7 +176,6 @@ const getEmployerApplications = async (req, res) => {
 
 // @desc    Update application status
 // @route   PATCH /api/applications/:id/status
-// @access  Private (Employer only)
 const updateApplicationStatus = async (req, res) => {
     try {
         const { status, note } = req.body;
@@ -211,10 +199,8 @@ const updateApplicationStatus = async (req, res) => {
 
         const previousStatus = application.status;
 
-        // Update status
         application.status = status;
 
-        // Add note if provided
         if (note) {
             application.notes.push({
                 text: note,

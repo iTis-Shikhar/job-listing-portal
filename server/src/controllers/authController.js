@@ -3,7 +3,6 @@ const generateToken = require('../utils/generateToken');
 
 // @desc    Register a new user
 // @route   POST /api/auth/register
-// @access  Public
 const registerUser = async (req, res) => {
     const { name, email, password, role } = req.body;
 
@@ -39,7 +38,6 @@ const registerUser = async (req, res) => {
 
 // @desc    Auth user & get token
 // @route   POST /api/auth/login
-// @access  Public
 const loginUser = async (req, res) => {
     const { email, password } = req.body;
 
@@ -64,7 +62,6 @@ const loginUser = async (req, res) => {
 
 // @desc    Get user profile
 // @route   GET /api/user/profile
-// @access  Private
 const getUserProfile = async (req, res) => {
     try {
         const user = await User.findById(req.user._id);

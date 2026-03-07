@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import axiosInstance from '../api/axiosInstance';
 import Sidebar from '../components/Sidebar';
 
 const SeekerProfile = () => {
@@ -19,7 +19,7 @@ const SeekerProfile = () => {
     const fetchProfile = async () => {
       try {
         const token = localStorage.getItem('token');
-        const res = await axios.get('http://localhost:5000/api/profile/jobseeker/me', {
+        const res = await axiosInstance.get('/profile/jobseeker/me', {
           headers: { Authorization: `Bearer ${token}` }
         });
         
@@ -87,10 +87,10 @@ const SeekerProfile = () => {
       };
       
       if (isExistingProfile) {
-        await axios.put('http://localhost:5000/api/profile/jobseeker', submitData, config);
+        await axiosInstance.put('/profile/jobseeker', submitData, config);
         alert('Profile Updated Successfully!');
       } else {
-        await axios.post('http://localhost:5000/api/profile/jobseeker', submitData, config);
+        await axiosInstance.post('/profile/jobseeker', submitData, config);
         alert('Profile Created Successfully!');
         setIsExistingProfile(true);
       }
