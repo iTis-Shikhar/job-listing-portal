@@ -139,7 +139,7 @@ const getEmployerDashboard = async (req, res) => {
             .lean();
 
         // Build application query (with optional date range)
-        const appQuery = { employer: req.user.id };
+        const appQuery = { employer: req.user._id };
         if (sinceDate) appQuery.createdAt = { $gte: sinceDate };
 
         // Aggregate funnel counts per job (avoids loading all documents into memory)

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import axiosInstance from '../api/axiosInstance';
 import Sidebar from '../components/Sidebar';
 
@@ -11,7 +11,7 @@ const Applicants = () => {
     const fetchApplications = async () => {
       try {
         const token = localStorage.getItem('token');
-        const res = await axiosInstance.get('/applications/employer/me', {
+        const res = await axiosInstance.get('/api/applications/employer/me', {
           headers: { Authorization: `Bearer ${token}` }
         });
         setApplications(res.data.data || []);
@@ -24,21 +24,26 @@ const Applicants = () => {
     fetchApplications();
   }, []);
 
-  // Update application status
+  // Optimistic status update — update UI immediately, revert on error
   const updateStatus = async (id, newStatus) => {
+    // Save previous state for rollback
+    const previousApplications = applications;
+
+    // Optimistically update UI before the API call
+    setApplications(prev => prev.map(app =>
+      app._id === id ? { ...app, status: newStatus } : app
+    ));
+
     try {
       const token = localStorage.getItem('token');
-      await axiosInstance.patch(`/applications/${id}/status`, 
+      await axiosInstance.patch(`/api/applications/${id}/status`,
         { status: newStatus },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      
-      // Update UI instantly
-      setApplications(applications.map(app => 
-        app._id === id ? { ...app, status: newStatus } : app
-      ));
     } catch (error) {
-      alert('Failed to update status');
+      // Revert to previous state on failure
+      setApplications(previousApplications);
+      alert('Failed to update status. Changes reverted.');
       console.error(error);
     }
   };
@@ -49,7 +54,7 @@ const Applicants = () => {
       case 'Accepted': return 'bg-green-50 text-green-700 border-green-200';
       case 'Rejected': return 'bg-red-50 text-red-700 border-red-200';
       case 'Shortlisted': return 'bg-blue-50 text-blue-700 border-blue-200';
-      default: return 'bg-gray-50 text-gray-700 border-gray-200'; // Applied/Reviewed
+      default: return 'bg-gray-50 text-gray-700 border-gray-200';
     }
   };
 
@@ -98,7 +103,7 @@ const Applicants = () => {
                     <div className="text-sm text-brand-text space-y-1.5 mb-5 bg-brand-bg p-4 rounded-lg border border-brand-border inline-block min-w-[250px]">
                       <p className="flex items-center gap-2"><svg className="w-4 h-4 text-brand-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg> {app.jobSeekerProfile?.alternateEmail || app.jobSeeker?.email}</p>
                       <p className="flex items-center gap-2"><svg className="w-4 h-4 text-brand-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg> {app.jobSeekerProfile?.phone || 'No phone provided'}</p>
-                      {app.jobSeekerProfile?.currentJobTitle && <p className="flex items-center gap-2"><svg className="w-4 h-4 text-brand-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg> {app.jobSeekerProfile.currentJobTitle} ({app.jobSeekerProfile.yearsOfExperience} yrs exp)</p>}
+                      {app.jobSeekerProfile?.currentJobTitle && <p className="flex items-center gap-2"><svg className="w-4 h-4 text-brand-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg> {app.jobSeekerProfile?.currentJobTitle}{app.jobSeekerProfile?.yearsOfExperience ? ` (${app.jobSeekerProfile.yearsOfExperience} yrs exp)` : ''}</p>}
                     </div>
 
                     {app.coverLetter && (
@@ -113,15 +118,27 @@ const Applicants = () => {
                   {/* Right Col: Actions */}
                   <div className="md:w-64 flex flex-col justify-between border-t md:border-t-0 md:border-l border-brand-border pt-6 md:pt-0 md:pl-6 gap-4">
                     
-                    <a 
-                      href={app.resume?.url} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="w-full py-2.5 bg-brand-surface border-2 border-brand-primary text-brand-primary rounded-lg font-semibold hover:bg-brand-primary hover:text-white transition-all flex items-center justify-center gap-2 group"
-                    >
-                      <svg className="w-5 h-5 group-hover:animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
-                      View Resume
-                    </a>
+                    {app.resume?.url ? (
+                      <a
+                        href={app.resume.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-full py-2.5 bg-brand-surface border-2 border-brand-primary text-brand-primary rounded-lg font-semibold hover:bg-brand-primary hover:text-white transition-all flex items-center justify-center gap-2 group"
+                      >
+                        <svg className="w-5 h-5 group-hover:animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                        View Resume
+                      </a>
+                    ) : (
+                      <button
+                        disabled
+                        aria-disabled="true"
+                        title="Resume not available"
+                        className="w-full py-2.5 bg-brand-bg border-2 border-brand-border text-brand-muted rounded-lg font-semibold flex items-center justify-center gap-2 cursor-not-allowed opacity-60"
+                      >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                        Resume not available
+                      </button>
+                    )}
 
                     <div className="space-y-3 bg-brand-bg p-4 rounded-lg border border-brand-border">
                       <p className="text-xs text-brand-muted font-bold uppercase tracking-wider text-center">Update Status</p>
