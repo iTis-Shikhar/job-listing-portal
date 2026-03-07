@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import axiosInstance from '../api/axiosInstance';
 import Sidebar from '../components/Sidebar';
 import logo1 from '../assets/logo1.png';
 import { Link } from 'react-router-dom';
@@ -13,7 +13,7 @@ const EmployerDashboard = () => {
     const fetchDashboardData = async () => {
       try {
         const token = localStorage.getItem('token');
-        const res = await axios.get('http://localhost:5000/api/dashboard/employer', {
+        const res = await axiosInstance.get('/dashboard/employer', {
           headers: { Authorization: `Bearer ${token}` }
         });
         

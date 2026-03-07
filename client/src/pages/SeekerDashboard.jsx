@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import axiosInstance from '../api/axiosInstance';
 import Sidebar from '../components/Sidebar';
 import logo1 from '../assets/logo1.png'; 
 
@@ -24,8 +24,8 @@ const SeekerDashboard = () => {
         const token = localStorage.getItem('token');
         
         const [jobsRes, appsRes] = await Promise.all([
-          axios.get('http://localhost:5000/api/jobs'),
-          axios.get('http://localhost:5000/api/applications/my-applications', {
+          axiosInstance.get('/jobs'),
+          axiosInstance.get('/applications/my-applications', {
             headers: { Authorization: `Bearer ${token}` }
           })
         ]);
@@ -68,7 +68,7 @@ const SeekerDashboard = () => {
       formData.append('coverLetter', coverLetter);
       formData.append('resume', resumeFile);
 
-      await axios.post('http://localhost:5000/api/applications', formData, {
+      await axiosInstance.post('/applications', formData, {
         headers: { 
           Authorization: `Bearer ${token}`,
           'Content-Type': 'multipart/form-data'
