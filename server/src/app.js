@@ -16,9 +16,16 @@ const connectDB = require('./config/db');
 connectDB();
 
 app.use(express.json());
+
+// Validate CLIENT_URL at startup — fail fast rather than silently allowing all origins
+if (!process.env.CLIENT_URL) {
+    throw new Error(
+        'set client url '
+    );
+}
 app.use(cors({
-  origin: process.env.CLIENT_URL,
-  credentials: true
+    origin: process.env.CLIENT_URL,
+    credentials: true
 }));
 
 app.get('/', (req, res) => {
