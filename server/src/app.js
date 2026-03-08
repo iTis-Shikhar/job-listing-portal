@@ -23,8 +23,20 @@ if (!process.env.CLIENT_URL) {
         'set client url '
     );
 }
+// Build list of allowed origins from env, stripping any trailing slashes
+const allowedOrigins = [
+    process.env.CLIENT_URL?.replace(/\/+$/, ''),
+    'http://localhost:5173',
+].filter(Boolean);
+
 app.use(cors({
-    origin: process.env.CLIENT_URL,
+    origin: (origin, callback) => {
+        // Allow server-to-server requests (no origin) and whitelisted origins
+        if (!origin || allowedOrigins.includes(origin)) {
+            return callback(null, true);
+        }
+        callback(new Error(`CORS: origin '${origin}' not allowed`));
+    },
     credentials: true
 }));
 
