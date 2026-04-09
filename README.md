@@ -1,6 +1,6 @@
 # Profilia 🚀
 
-**Live Demo:** [Click here to view the live application](profiliaa-web-app.netlify.app/)
+## Live Demo: <a href="## Live Demo: <a href="https://credi-fy.vercel.app/" target="_blank" rel="noopener noreferrer">Click here to view the live application</a>" target="_blank" rel="noopener noreferrer">Click here to view the live application</a>
 
 Profilia is a modern, full-stack B2B SaaS job board platform built to seamlessly connect ambitious talent with industry-leading employers. Featuring a crisp, industry-standard UI, role-based dashboards, and real-time application tracking, Profilia streamlines the entire hiring ecosystem.
 
